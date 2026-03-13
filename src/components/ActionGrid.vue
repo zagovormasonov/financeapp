@@ -1,8 +1,8 @@
 
 <script setup>
-import { Plus, MessageCircle } from 'lucide-vue-next';
+import { Plus, MessageCircle, Sparkles } from 'lucide-vue-next';
 
-const emit = defineEmits(['navigate', 'open-add']);
+const emit = defineEmits(['navigate', 'open-add', 'open-import']);
 </script>
 
 <template>
@@ -11,6 +11,10 @@ const emit = defineEmits(['navigate', 'open-add']);
     <button class="action-btn primary-action" @click="emit('open-add')">
       <Plus :size="20" />
       <span>Добавить трату</span>
+    </button>
+    <button class="action-btn sparkles-action" @click="emit('open-import')">
+      <Sparkles :size="20" />
+      <span>Умный импорт из банка</span>
     </button>
     <button class="action-btn secondary-action">
       <MessageCircle :size="20" />
@@ -51,6 +55,12 @@ const emit = defineEmits(['navigate', 'open-add']);
 .primary-action {
   background-color: var(--primary-light);
   color: var(--primary);
+}
+
+.sparkles-action {
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  color: white;
+  font-weight: 600;
 }
 
 .secondary-action {

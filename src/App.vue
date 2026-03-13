@@ -54,7 +54,7 @@ onMounted(() => {
       <GoalCard />
 
       <!-- Actions -->
-      <ActionGrid @navigate="currentScreen = $event" @open-add="isAddModalOpen = true" />
+      <ActionGrid @navigate="currentScreen = $event" @open-add="isAddModalOpen = true" @open-import="isImportModalOpen = true" />
     </template>
 
     <template v-else-if="currentScreen === 'profile'">

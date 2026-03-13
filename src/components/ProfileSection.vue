@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue';
 import { ChevronLeft } from 'lucide-vue-next';
 
-const emit = defineEmits(['back']);
+const emit = defineEmits(['back', 'open-import']);
 
 const profile = ref({
   name: 'Аня',

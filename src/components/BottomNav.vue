@@ -48,7 +48,7 @@ const emit = defineEmits(['navigate']);
 }
 
 .nav-container {
-  background: white;
+  background: var(--card-bg);
   border-radius: 100px;
   display: flex;
   justify-content: space-between;
@@ -69,12 +69,12 @@ const emit = defineEmits(['navigate']);
   border-radius: 100px;
   cursor: pointer;
   transition: var(--transition);
-  color: #777;
+  color: var(--text-secondary);
   flex: 1;
 }
 
 .nav-item.active {
-  background-color: #f0f0f0;
+  background-color: var(--bg-color);
   color: var(--primary);
 }
 

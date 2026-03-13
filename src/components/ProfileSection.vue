@@ -1,6 +1,5 @@
-
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { ChevronLeft } from 'lucide-vue-next';
 
 const emit = defineEmits(['back']);
@@ -9,11 +8,25 @@ const profile = ref({
   name: 'Аня',
   password: '*************',
   banks: 'Альфабанк, Тбанк, Сбербанк',
-  theme: 'Светлая'
+  theme: localStorage.getItem('theme') === 'dark' ? 'Темная' : 'Светлая'
 });
 
 const editingField = ref(null);
 const tempValue = ref('');
+
+const applyTheme = (theme) => {
+  if (theme === 'Темная') {
+    document.body.classList.add('dark-theme');
+    localStorage.setItem('theme', 'dark');
+  } else {
+    document.body.classList.remove('dark-theme');
+    localStorage.setItem('theme', 'light');
+  }
+};
+
+onMounted(() => {
+  applyTheme(profile.value.theme);
+});
 
 const startEdit = (field) => {
   editingField.value = field;
@@ -23,6 +36,9 @@ const startEdit = (field) => {
 const saveEdit = () => {
   if (editingField.value) {
     profile.value[editingField.value] = tempValue.value;
+    if (editingField.value === 'theme') {
+      applyTheme(tempValue.value);
+    }
     editingField.value = null;
   }
 };
@@ -148,7 +164,8 @@ const cancelEdit = () => {
   height: 40px;
   border-radius: 50%;
   border: none;
-  background: white;
+  background: var(--card-bg);
+  color: var(--text-main);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -159,8 +176,8 @@ const cancelEdit = () => {
 .header-title {
   font-size: 18px;
   font-weight: 700;
-  background: #ffffff;
-  color: rgb(0, 0, 0);
+  background: var(--card-bg);
+  color: var(--text-main);
   padding: 10px 24px;
   border-radius: 100px;
 }
@@ -235,11 +252,12 @@ const cancelEdit = () => {
 .edit-input {
   width: 100%;
   padding: 8px 12px;
-  border: 1px solid #e0e6f0;
+  border: 1px solid var(--primary-light);
   border-radius: 12px;
   font-family: inherit;
   font-size: 16px;
-  background: #f8faff;
+  background: var(--bg-color);
+  color: var(--text-main);
   outline: none;
 }
 
@@ -272,7 +290,7 @@ const cancelEdit = () => {
 }
 
 .action-link {
-  background: white;
+  background: var(--card-bg);
   border: none;
   padding: 18px;
   border-radius: 100px;

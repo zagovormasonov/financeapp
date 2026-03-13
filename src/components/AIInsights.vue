@@ -180,7 +180,8 @@ onMounted(() => {
   align-items: center;
   gap: 12px;
   padding: 24px;
-  background: white;
+  background: var(--card-bg);
+  color: var(--text-secondary);
   border-radius: 24px;
   color: #666;
 }
@@ -188,7 +189,7 @@ onMounted(() => {
 .spinner {
   width: 24px;
   height: 24px;
-  border: 3px solid #f3f3f3;
+  border: 3px solid var(--primary-light);
   border-top: 3px solid var(--primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;

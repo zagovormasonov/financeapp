@@ -41,7 +41,7 @@ const emit = defineEmits(['open-profile'])
   height: 44px;
   border-radius: 50%;
   overflow: hidden;
-  background: #eee;
+  background: var(--card-bg);
   cursor: pointer;
   transition: var(--transition);
 }

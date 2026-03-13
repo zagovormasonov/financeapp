@@ -49,7 +49,7 @@ const emit = defineEmits(['navigate', 'open-add']);
 }
 
 .primary-action {
-  background-color: #e6efff;
+  background-color: var(--primary-light);
   color: var(--primary);
 }
 

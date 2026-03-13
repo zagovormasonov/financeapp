@@ -128,8 +128,8 @@ const filteredTransactions = computed(() => {
 .header-title {
   font-size: 18px;
   font-weight: 700;
-  background: #ffffff;
-  color: #000;
+  background: var(--card-bg);
+  color: var(--text-main);
   padding: 10px 24px;
   border-radius: 100px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.03);
@@ -155,7 +155,7 @@ const filteredTransactions = computed(() => {
 }
 
 .search-bar {
-  background: white;
+  background: var(--card-bg);
   border-radius: 100px;
   padding: 12px 20px;
   display: flex;
@@ -170,7 +170,11 @@ const filteredTransactions = computed(() => {
   outline: none;
   font-family: inherit;
   font-size: 16px;
-  width: 100%;
+  color: var(--text-main);
+}
+
+.search-bar input::placeholder {
+  color: var(--text-secondary);
 }
 
 .tabs-container {
@@ -178,7 +182,7 @@ const filteredTransactions = computed(() => {
 }
 
 .tabs {
-  background: #e8ebf2;
+  background: var(--primary-light);
   border-radius: 100px;
   display: flex;
   padding: 4px;
@@ -197,8 +201,8 @@ const filteredTransactions = computed(() => {
 }
 
 .tab.active {
-  background: #ffffff;
-  color: rgb(0, 0, 0);
+  background: var(--card-bg);
+  color: var(--text-main);
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
@@ -218,7 +222,7 @@ const filteredTransactions = computed(() => {
   font-size: 18px;
   font-weight: 600;
   padding-left: 8px;
-  color: #000;
+  color: var(--text-main);
 }
 
 .transaction-card {
@@ -234,7 +238,7 @@ const filteredTransactions = computed(() => {
 .transaction-name {
   font-size: 17px;
   font-weight: 500;
-  color: #000;
+  color: var(--text-main);
 }
 
 .transaction-amount {

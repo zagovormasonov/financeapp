@@ -1,6 +1,6 @@
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import HeaderSection from './components/HeaderSection.vue'
 import BalanceSection from './components/BalanceSection.vue'
 import ActionGrid from './components/ActionGrid.vue'
@@ -25,6 +25,15 @@ const closeAddModal = () => {
   isAddModalOpen.value = false
   editingItem.value = null
 }
+
+onMounted(() => {
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'dark') {
+    document.body.classList.add('dark-theme');
+  } else {
+    document.body.classList.remove('dark-theme');
+  }
+});
 </script>
 
 <template>

@@ -118,7 +118,7 @@ const handleClose = () => {
 }
 
 .modal-content {
-  background: white;
+  background: var(--card-bg);
   width: 100%;
   border-radius: 30px 30px 0 0;
   padding: 24px;
@@ -143,7 +143,8 @@ const handleClose = () => {
 }
 
 .close-btn, .delete-btn {
-  background: #f0f0f0;
+  background: var(--bg-color);
+  color: var(--text-main);
   border: none;
   border-radius: 50%;
   width: 36px;
@@ -155,7 +156,7 @@ const handleClose = () => {
 }
 
 .delete-btn {
-  background: #fff0f0;
+  background: rgba(255, 59, 48, 0.1);
 }
 
 .add-form {
@@ -173,15 +174,16 @@ const handleClose = () => {
 .input-group label {
   font-weight: 600;
   font-size: 14px;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .input-group input {
   padding: 14px;
   border-radius: 12px;
-  border: 1px solid #eee;
+  border: 1px solid var(--primary-light);
   font-size: 16px;
-  background: #f9f9f9;
+  background: var(--bg-color);
+  color: var(--text-main);
 }
 
 .type-selector {
@@ -193,8 +195,9 @@ const handleClose = () => {
   flex: 1;
   padding: 12px;
   border-radius: 12px;
-  border: 1px solid #eee;
-  background: white;
+  border: 1px solid var(--primary-light);
+  background: var(--card-bg);
+  color: var(--text-main);
   font-weight: 600;
   cursor: pointer;
 }
@@ -206,7 +209,7 @@ const handleClose = () => {
 }
 
 .submit-btn {
-  background: #000;
+  background: var(--primary);
   color: white;
   padding: 16px;
   border-radius: 16px;

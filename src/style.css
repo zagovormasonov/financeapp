@@ -13,6 +13,16 @@
   --transition: all 0.2s ease-in-out;
 }
 
+.dark-theme {
+  --bg-color: #000000;
+  --card-bg: #1c1c1e;
+  --primary: #3770ff;
+  --primary-light: #1c1c1e;
+  --success: #32d74b;
+  --text-main: #ffffff;
+  --text-secondary: #8e8e93;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;

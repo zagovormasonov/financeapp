@@ -38,6 +38,43 @@ export function addTransaction(name, amount, type = 'expense', category = 'Other
   localStorage.removeItem('aiInsights');
 }
 
+export function updateTransaction(id, { name, amount, type, category }) {
+  for (const group of transactions.value) {
+    const index = group.items.findIndex(item => item.id === id);
+    if (index !== -1) {
+      group.items[index] = {
+        ...group.items[index],
+        name,
+        amount: type === 'expense' ? -Math.abs(amount) : Math.abs(amount),
+        type,
+        category
+      };
+      break;
+    }
+  }
+  // Clear insights
+  aiInsights.value = null;
+  localStorage.removeItem('aiInsights');
+}
+
+export function deleteTransaction(id) {
+  for (let i = 0; i < transactions.value.length; i++) {
+    const group = transactions.value[i];
+    const index = group.items.findIndex(item => item.id === id);
+    if (index !== -1) {
+      group.items.splice(index, 1);
+      // Remove empty date group
+      if (group.items.length === 0) {
+        transactions.value.splice(i, 1);
+      }
+      break;
+    }
+  }
+  // Clear insights
+  aiInsights.value = null;
+  localStorage.removeItem('aiInsights');
+}
+
 // Persist to localStorage
 watch(transactions, (newVal) => {
   localStorage.setItem('transactions', JSON.stringify(newVal));

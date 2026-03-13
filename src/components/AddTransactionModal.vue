@@ -1,21 +1,55 @@
 <script setup>
-import { ref } from 'vue';
-import { addTransaction } from '../data/mockData';
-import { X } from 'lucide-vue-next';
+import { ref, watch } from 'vue';
+import { addTransaction, updateTransaction, deleteTransaction } from '../data/mockData';
+import { X, Trash2 } from 'lucide-vue-next';
 
-const props = defineProps(['isOpen']);
+const props = defineProps({
+  isOpen: Boolean,
+  editItem: Object // If provided, we are in edit mode
+});
 const emit = defineEmits(['close']);
 
 const name = ref('');
 const amount = ref('');
 const type = ref('expense');
 
+// Watch for editItem changes to populate form
+watch(() => props.editItem, (newVal) => {
+  if (newVal) {
+    name.value = newVal.name;
+    amount.value = Math.abs(newVal.amount);
+    type.value = newVal.type;
+  } else {
+    name.value = '';
+    amount.value = '';
+    type.value = 'expense';
+  }
+}, { immediate: true });
+
 const handleSubmit = () => {
   if (!name.value || !amount.value) return;
   
-  addTransaction(name.value, parseFloat(amount.value), type.value);
+  if (props.editItem) {
+    updateTransaction(props.editItem.id, {
+      name: name.value,
+      amount: parseFloat(amount.value),
+      type: type.value
+    });
+  } else {
+    addTransaction(name.value, parseFloat(amount.value), type.value);
+  }
   
-  // Reset and close
+  handleClose();
+};
+
+const handleDelete = () => {
+  if (props.editItem && confirm('Удалить эту запись?')) {
+    deleteTransaction(props.editItem.id);
+    handleClose();
+  }
+};
+
+const handleClose = () => {
   name.value = '';
   amount.value = '';
   emit('close');
@@ -23,11 +57,18 @@ const handleSubmit = () => {
 </script>
 
 <template>
-  <div v-if="isOpen" class="modal-overlay" @click.self="emit('close')">
+  <div v-if="isOpen" class="modal-overlay" @click.self="handleClose">
     <div class="modal-content">
       <div class="modal-header">
-        <h3>Добавить трату</h3>
-        <button class="close-btn" @click="emit('close')"><X :size="20" /></button>
+        <h3>{{ editItem ? 'Редактировать' : 'Добавить трату' }}</h3>
+        <div class="header-actions">
+          <button v-if="editItem" class="delete-btn" @click="handleDelete">
+            <Trash2 :size="20" color="#ff3b30" />
+          </button>
+          <button class="close-btn" @click="handleClose">
+            <X :size="20" />
+          </button>
+        </div>
       </div>
       
       <form @submit.prevent="handleSubmit" class="add-form">
@@ -54,7 +95,9 @@ const handleSubmit = () => {
           >Доход</button>
         </div>
 
-        <button type="submit" class="submit-btn">Сохранить</button>
+        <button type="submit" class="submit-btn">
+          {{ editItem ? 'Обновить' : 'Сохранить' }}
+        </button>
       </form>
     </div>
   </div>
@@ -94,15 +137,25 @@ const handleSubmit = () => {
   margin-bottom: 24px;
 }
 
-.close-btn {
+.header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.close-btn, .delete-btn {
   background: #f0f0f0;
   border: none;
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+}
+
+.delete-btn {
+  background: #fff0f0;
 }
 
 .add-form {

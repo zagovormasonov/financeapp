@@ -14,6 +14,17 @@ import AddTransactionModal from './components/AddTransactionModal.vue'
 
 const currentScreen = ref('home')
 const isAddModalOpen = ref(false)
+const editingItem = ref(null)
+
+const openEditModal = (item) => {
+  editingItem.value = item
+  isAddModalOpen.value = true
+}
+
+const closeAddModal = () => {
+  isAddModalOpen.value = false
+  editingItem.value = null
+}
 </script>
 
 <template>
@@ -40,14 +51,22 @@ const isAddModalOpen = ref(false)
     </template>
 
     <template v-else-if="currentScreen === 'expenses'">
-      <ExpensesSection @back="currentScreen = 'home'" @open-profile="currentScreen = 'profile'" />
+      <ExpensesSection 
+        @back="currentScreen = 'home'" 
+        @open-profile="currentScreen = 'profile'" 
+        @edit-item="openEditModal"
+      />
     </template>
 
     <!-- Bottom Navigation -->
     <BottomNav :activeSection="currentScreen" @navigate="currentScreen = $event" />
 
-    <!-- Add Transaction Modal -->
-    <AddTransactionModal :isOpen="isAddModalOpen" @close="isAddModalOpen = false" />
+    <!-- Add/Edit Transaction Modal -->
+    <AddTransactionModal 
+      :isOpen="isAddModalOpen" 
+      :editItem="editingItem"
+      @close="closeAddModal" 
+    />
   </div>
 </template>
 

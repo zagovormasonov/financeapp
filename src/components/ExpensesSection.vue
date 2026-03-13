@@ -4,7 +4,7 @@ import { ref, computed } from 'vue';
 import { ChevronLeft, Search } from 'lucide-vue-next';
 import { transactions as transactionsByDate } from '../data/mockData';
 
-const emit = defineEmits(['back', 'open-profile']);
+const emit = defineEmits(['back', 'open-profile', 'edit-item']);
 
 const activeTab = ref('all');
 const searchQuery = ref('');
@@ -74,7 +74,12 @@ const filteredTransactions = computed(() => {
       </div>
       <div v-for="group in filteredTransactions" :key="group.date" class="date-group">
         <div class="date-label">{{ group.date }}</div>
-        <div v-for="item in group.items" :key="item.id" class="card transaction-card">
+        <div 
+          v-for="item in group.items" 
+          :key="item.id" 
+          class="card transaction-card"
+          @click="emit('edit-item', item)"
+        >
           <div class="transaction-info">
             <span class="transaction-name">{{ item.name }}</span>
             <span class="transaction-amount" :class="item.type">

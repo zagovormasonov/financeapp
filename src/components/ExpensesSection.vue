@@ -15,7 +15,7 @@ const formatAmount = (amount) => {
 };
 
 const filteredTransactions = computed(() => {
-  let result = transactionsByDate;
+  let result = transactionsByDate.value;
 
   // Search filter
   if (searchQuery.value) {

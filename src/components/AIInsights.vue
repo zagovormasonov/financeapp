@@ -113,7 +113,7 @@ onMounted(() => {
   cursor: pointer;
   transition: opacity 0.2s ease;
   width: auto;
-  display: inline-block;  
+  display: inline-block;   
 }
 
 .insight-action-btn:hover:not(:disabled) {

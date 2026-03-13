@@ -5,6 +5,21 @@ export default async function handler(request, response) {
   }
 
   const { transactions } = request.body;
+  
+  // Calculate summary for the AI to make a better decision
+  let totalIncome = 0;
+  let totalExpenses = 0;
+  
+  transactions.forEach(group => {
+    group.items.forEach(item => {
+      if (item.type === 'income') totalIncome += Math.abs(item.amount);
+      else totalExpenses += Math.abs(item.amount);
+    });
+  });
+  
+  const balance = totalIncome - totalExpenses;
+  const financialSummary = `Итог: Доходы: ${totalIncome} ₽, Расходы: ${totalExpenses} ₽, Баланс: ${balance} ₽.`;
+
   const YANDEX_API_KEY = process.env.YANDEX_API_KEY;
   const YANDEX_FOLDER_ID = process.env.YANDEX_FOLDER_ID;
 
@@ -22,11 +37,11 @@ export default async function handler(request, response) {
     messages: [
       {
         role: 'system',
-        text: 'Ты — профессиональный финансовый аналитик. Твоя задача — глубоко проанализировать список транзакций пользователя (доходы и расходы). Дай два максимально точных совета. Первый — критический ("Внимание"): где есть перекос или риск. Обязательно добавь поле action, предложив конкретное действие в виде кнопки. Второй — позитивный ("Ты молодец!"): отметь достижение. Ответ должен быть строго в формате JSON: [{"title": "Внимание", "text": "...", "type": "warning", "action": {"label": "Текст кнопки действия"}}, {"title": "Ты молодец!", "text": "...", "type": "success"}]'
+        text: 'Ты — профессиональный финансовый аналитик. Проанализируй данные пользователя. Дай один критический совет ("Внимание") с конкретным действием (поле action). Позитивный совет ("Ты молодец!") давай ТОЛЬКО если доходы превышают расходы или есть реальная экономия. Если ситуация негативная (баланс минус или расходы > доходы), возвращай массив только с одним объектом "Внимание". Ответ: JSON массив [{"title": "Внимание/Ты молодец!", "text": "...", "type": "warning/success", "action": {"label": "..."}}]'
       },
       {
         role: 'user',
-        text: `Вот мои транзакции за последние дни: ${JSON.stringify(transactions)}. Проанализируй их и дай советы.`
+        text: `${financialSummary} Транзакции: ${JSON.stringify(transactions)}.`
       }
     ]
   };

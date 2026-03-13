@@ -2,36 +2,12 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { ChevronLeft, Search } from 'lucide-vue-next';
+import { transactions as transactionsByDate } from '../data/mockData';
 
 const emit = defineEmits(['back', 'open-profile']);
 
 const activeTab = ref('all');
 const searchQuery = ref('');
-
-const transactionsByDate = [
-  {
-    date: '14 марта',
-    items: [
-      { id: 1, name: 'Яндекс Еда', amount: -890, type: 'expense' },
-      { id: 2, name: 'Яндекс Еда', amount: -890, type: 'expense' },
-      { id: 3, name: 'Перечисление зарплаты', amount: 250000, type: 'income' },
-    ]
-  },
-  {
-    date: '12 марта',
-    items: [
-      { id: 4, name: 'Яндекс Еда', amount: -890, type: 'expense' },
-      { id: 5, name: 'Яндекс Еда', amount: -890, type: 'expense' },
-      { id: 6, name: 'Перечисление зарплаты', amount: 250000, type: 'income' },
-    ]
-  },
-  {
-    date: '11 марта',
-    items: [
-      { id: 7, name: 'Яндекс Еда', amount: -890, type: 'expense' },
-    ]
-  }
-];
 
 const formatAmount = (amount) => {
   const sign = amount > 0 ? '+' : '';

@@ -6,6 +6,7 @@ import BalanceSection from './components/BalanceSection.vue'
 import ActionGrid from './components/ActionGrid.vue'
 import GoalCard from './components/GoalCard.vue'
 import NotificationCards from './components/NotificationCards.vue'
+import AIInsights from './components/AIInsights.vue'
 import BottomNav from './components/BottomNav.vue'
 import ProfileSection from './components/ProfileSection.vue'
 import ExpensesSection from './components/ExpensesSection.vue'
@@ -22,8 +23,8 @@ const currentScreen = ref('home')
       <!-- Balance Card -->
       <BalanceSection />
 
-      <!-- Notifications -->
-      <NotificationCards />
+      <!-- AI Insights -->
+      <AIInsights />
 
       <!-- Goal Card -->
       <GoalCard />

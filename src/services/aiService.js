@@ -23,6 +23,29 @@ export async function getFinancialInsights(transactions) {
   }
 }
 
+export async function getActionSolutions(insightText, actionLabel) {
+  try {
+    const response = await fetch('/api/ai-action', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ insightText, actionLabel })
+    });
+
+    if (!response.ok) {
+      console.warn('Action proxy request failed. Using mock data.');
+      return ['Пройдите в профиль', 'Установите лимит 5 000 ₽'];
+    }
+
+    const data = await response.json();
+    return Array.isArray(data) ? data : [data];
+  } catch (error) {
+    console.error('Error calling AI action proxy:', error);
+    return ['Попробуйте позже'];
+  }
+}
+
 function getMockInsights() {
   return [
     {

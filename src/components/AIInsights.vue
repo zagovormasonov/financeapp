@@ -1,6 +1,6 @@
 <script setup>
-import { onMounted } from 'vue';
-import { getFinancialInsights } from '../services/aiService';
+import { ref, onMounted } from 'vue';
+import { getFinancialInsights, getActionSolutions } from '../services/aiService';
 import { transactions, aiInsights, isAiLoading } from '../data/mockData';
 
 const loadInsights = async () => {
@@ -16,9 +16,19 @@ const loadInsights = async () => {
   }
 };
 
-const handleAction = (action) => {
-  if (!action) return;
-  alert(`ИИ предлагает действие: ${action.label}`);
+const handleAction = async (insight) => {
+  if (!insight.action || insight.isActionLoading || insight.solutions) return;
+  
+  insight.isActionLoading = true;
+  try {
+    const solutions = await getActionSolutions(insight.text, insight.action.label);
+    insight.solutions = solutions;
+  } catch (error) {
+    console.error('Failed to get solutions:', error);
+    insight.solutions = ['Не удалось загрузить решения'];
+  } finally {
+    insight.isActionLoading = false;
+  }
 };
 
 onMounted(() => {
@@ -38,10 +48,21 @@ onMounted(() => {
         <div class="card-title">{{ insight.title }}</div>
         <div class="card-text text-secondary">
           {{ insight.text }}
-          <div v-if="insight.action" class="action-container">
-            <button class="insight-action-btn" @click="handleAction(insight.action)">
-              {{ insight.action.label }}
+          
+          <div v-if="insight.action && !insight.solutions" class="action-container">
+            <button class="insight-action-btn" :disabled="insight.isActionLoading" @click="handleAction(insight)">
+              <span v-if="insight.isActionLoading" class="mini-spinner"></span>
+              {{ insight.isActionLoading ? 'Думаю...' : insight.action.label }}
             </button>
+          </div>
+
+          <div v-if="insight.solutions" class="solutions-container">
+            <h4>Возможные решения:</h4>
+            <ul class="solutions-list">
+              <li v-for="(sol, sIdx) in insight.solutions" :key="sIdx">
+                {{ sol }}
+              </li>
+            </ul>
           </div>
         </div>
       </div>
@@ -95,8 +116,62 @@ onMounted(() => {
   display: inline-block;
 }
 
-.insight-action-btn:hover {
+.insight-action-btn:hover:not(:disabled) {
   opacity: 0.9;
+}
+
+.insight-action-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.mini-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.solutions-container {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+.solutions-container h4 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: var(--text-main);
+}
+
+.solutions-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.solutions-list li {
+  position: relative;
+  padding-left: 20px;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.solutions-list li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: var(--primary);
+  font-weight: bold;
 }
 
 .loading-state {

@@ -11,9 +11,11 @@ import BottomNav from './components/BottomNav.vue'
 import ProfileSection from './components/ProfileSection.vue'
 import ExpensesSection from './components/ExpensesSection.vue'
 import AddTransactionModal from './components/AddTransactionModal.vue'
+import SmartImportModal from './components/SmartImportModal.vue'
 
 const currentScreen = ref('home')
 const isAddModalOpen = ref(false)
+const isImportModalOpen = ref(false)
 const editingItem = ref(null)
 
 const openEditModal = (item) => {
@@ -56,7 +58,7 @@ onMounted(() => {
     </template>
 
     <template v-else-if="currentScreen === 'profile'">
-      <ProfileSection @back="currentScreen = 'home'" />
+      <ProfileSection @back="currentScreen = 'home'" @open-import="isImportModalOpen = true" />
     </template>
 
     <template v-else-if="currentScreen === 'expenses'">
@@ -75,6 +77,12 @@ onMounted(() => {
       :isOpen="isAddModalOpen" 
       :editItem="editingItem"
       @close="closeAddModal" 
+    />
+
+    <!-- Smart Import Modal -->
+    <SmartImportModal 
+      :isOpen="isImportModalOpen" 
+      @close="isImportModalOpen = false" 
     />
   </div>
 </template>

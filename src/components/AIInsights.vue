@@ -103,7 +103,7 @@ onMounted(() => {
 }
 
 .insight-action-btn {
-  background: #000;
+  background: var(--primary);
   color: white;
   border: none;
   border-radius: 100px;
@@ -181,9 +181,8 @@ onMounted(() => {
   gap: 12px;
   padding: 24px;
   background: var(--card-bg);
-  color: var(--text-secondary);
   border-radius: 24px;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .spinner {

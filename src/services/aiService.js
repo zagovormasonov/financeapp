@@ -46,17 +46,20 @@ export async function getActionSolutions(insightText, actionLabel) {
   }
 }
 
-function getMockInsights() {
-  return [
-    {
-      title: 'Внимание',
-      text: 'Для работы ИИ необходимо настроить переменные окружения в Vercel (YANDEX_API_KEY и YANDEX_FOLDER_ID). Пока показываю тестовый совет.',
-      type: 'warning'
-    },
-    {
-      title: 'Ты молодец!',
-      text: 'Вы отлично распределяете бюджет! Продолжайте в том же духе.',
-      type: 'success'
-    }
-  ];
+export async function parseTransactions(text) {
+  try {
+    const response = await fetch('/api/ai-parse', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ text })
+    });
+
+    if (!response.ok) throw new Error('Parse failed');
+    return await response.json();
+  } catch (error) {
+    console.error('Error parsing transactions:', error);
+    return [];
+  }
 }

@@ -131,6 +131,17 @@ const cancelEdit = () => {
         <div v-else class="value">{{ profile.theme }}</div>
       </div>
 
+      <!-- Bank Integration Section -->
+      <div class="card settings-card">
+        <div class="settings-row">
+          <div class="label">Автоматизация</div>
+        </div>
+        <div class="bank-integration-row">
+          <p class="text-secondary small">Импортируйте транзакции из любого банка, просто скопировав текст выписки.</p>
+          <button class="import-trigger-btn" @click="emit('open-import')">Использовать умный импорт</button>
+        </div>
+      </div>
+
       <div class="actions">
         <button class="action-link danger">Выйти из аккаунта</button>
         <button class="action-link primary">Удалить аккаунт</button>
@@ -311,5 +322,29 @@ const cancelEdit = () => {
 
 .action-link:active {
   transform: scale(0.98);
+}
+.bank-integration-row {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.small {
+  font-size: 13px !important;
+}
+
+.import-trigger-btn {
+  background: var(--primary-light);
+  color: var(--primary);
+  border: none;
+  padding: 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.import-trigger-btn:active {
+  opacity: 0.8;
 }
 </style>

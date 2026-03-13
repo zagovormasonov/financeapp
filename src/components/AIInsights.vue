@@ -16,6 +16,11 @@ const loadInsights = async () => {
   }
 };
 
+const handleAction = (action) => {
+  if (!action) return;
+  alert(`ИИ предлагает действие: ${action.label}`);
+};
+
 onMounted(() => {
   loadInsights();
 });
@@ -33,6 +38,11 @@ onMounted(() => {
         <div class="card-title">{{ insight.title }}</div>
         <div class="card-text text-secondary">
           {{ insight.text }}
+          <div v-if="insight.action" class="action-container">
+            <button class="insight-action-btn" @click="handleAction(insight.action)">
+              {{ insight.action.label }}
+            </button>
+          </div>
         </div>
       </div>
     </template>
@@ -65,6 +75,28 @@ onMounted(() => {
 .card-text {
   font-size: 16px;
   line-height: 1.4;
+}
+
+.action-container {
+  margin-top: 12px;
+}
+
+.insight-action-btn {
+  background: #000;
+  color: white;
+  border: none;
+  border-radius: 100px;
+  padding: 10px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  width: auto;
+  display: inline-block;
+}
+
+.insight-action-btn:hover {
+  opacity: 0.9;
 }
 
 .loading-state {

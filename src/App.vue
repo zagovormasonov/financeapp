@@ -10,8 +10,10 @@ import AIInsights from './components/AIInsights.vue'
 import BottomNav from './components/BottomNav.vue'
 import ProfileSection from './components/ProfileSection.vue'
 import ExpensesSection from './components/ExpensesSection.vue'
+import AddTransactionModal from './components/AddTransactionModal.vue'
 
 const currentScreen = ref('home')
+const isAddModalOpen = ref(false)
 </script>
 
 <template>
@@ -30,7 +32,7 @@ const currentScreen = ref('home')
       <GoalCard />
 
       <!-- Actions -->
-      <ActionGrid @navigate="currentScreen = $event" />
+      <ActionGrid @navigate="currentScreen = $event" @open-add="isAddModalOpen = true" />
     </template>
 
     <template v-else-if="currentScreen === 'profile'">
@@ -43,6 +45,9 @@ const currentScreen = ref('home')
 
     <!-- Bottom Navigation -->
     <BottomNav :activeSection="currentScreen" @navigate="currentScreen = $event" />
+
+    <!-- Add Transaction Modal -->
+    <AddTransactionModal :isOpen="isAddModalOpen" @close="isAddModalOpen = false" />
   </div>
 </template>
 

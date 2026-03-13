@@ -1,21 +1,37 @@
-
 <script setup>
-defineProps({
-  balance: {
-    type: String,
-    default: '124 850 ₽'
-  },
-  change: {
-    type: String,
-    default: '+12 340 ₽ сегодня'
-  }
-})
+import { computed } from 'vue';
+import { transactions } from '../data/mockData';
+
+const totals = computed(() => {
+  let totalBalance = 0;
+  let todayChange = 0;
+  
+  const options = { day: 'numeric', month: 'long' };
+  const todayStr = new Date().toLocaleDateString('ru-RU', options);
+
+  transactions.value.forEach(group => {
+    group.items.forEach(item => {
+      totalBalance += item.amount;
+      if (group.date === todayStr) {
+        todayChange += item.amount;
+      }
+    });
+  });
+
+  return {
+    balance: totalBalance.toLocaleString('ru-RU') + ' ₽',
+    change: (todayChange >= 0 ? '+' : '') + todayChange.toLocaleString('ru-RU') + ' ₽ сегодня',
+    isPositive: todayChange >= 0
+  };
+});
 </script>
 
 <template>
   <div class="card balance-card">
-    <div class="balance-amount">{{ balance }}</div>
-    <div class="change-text">{{ change }}</div>
+    <div class="balance-amount">{{ totals.balance }}</div>
+    <div class="change-text" :class="{ 'negative': !totals.isPositive }">
+      {{ totals.change }}
+    </div>
   </div>
 </template>
 
@@ -37,5 +53,9 @@ defineProps({
   font-size: 18px;
   font-weight: 200;
   color: var(--success);
+}
+
+.change-text.negative {
+  color: #ff3b30;
 }
 </style>

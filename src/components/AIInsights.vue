@@ -1,31 +1,35 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { onMounted } from 'vue';
 import { getFinancialInsights } from '../services/aiService';
-import { transactions } from '../data/mockData';
+import { transactions, aiInsights, isAiLoading } from '../data/mockData';
 
-const insights = ref([]);
-const isLoading = ref(true);
-
-onMounted(async () => {
+const loadInsights = async () => {
+  if (aiInsights.value || isAiLoading.value) return;
+  
+  isAiLoading.value = true;
   try {
-    insights.value = await getFinancialInsights(transactions);
+    aiInsights.value = await getFinancialInsights(transactions.value);
   } catch (error) {
     console.error('Failed to load insights:', error);
   } finally {
-    isLoading.value = false;
+    isAiLoading.value = false;
   }
+};
+
+onMounted(() => {
+  loadInsights();
 });
 </script>
 
 <template>
   <div class="ai-insights">
-    <div v-if="isLoading" class="loading-state">
+    <div v-if="isAiLoading" class="loading-state">
       <div class="spinner"></div>
       <span>ИИ анализирует ваши траты...</span>
     </div>
     
-    <template v-else>
-      <div v-for="(insight, index) in insights" :key="index" class="card ai-card" :class="insight.type">
+    <template v-else-if="aiInsights">
+      <div v-for="(insight, index) in aiInsights" :key="index" class="card ai-card" :class="insight.type">
         <div class="card-title">{{ insight.title }}</div>
         <div class="card-text text-secondary">
           {{ insight.text }}
@@ -88,7 +92,6 @@ onMounted(async () => {
   100% { transform: rotate(360deg); }
 }
 
-/* Optional: style based on type */
 .warning .card-title { color: #ff9500; }
 .success .card-title { color: #34c759; }
 </style>

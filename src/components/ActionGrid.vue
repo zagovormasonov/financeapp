@@ -2,13 +2,13 @@
 <script setup>
 import { Plus, MessageCircle } from 'lucide-vue-next';
 
-const emit = defineEmits(['navigate']);
+const emit = defineEmits(['navigate', 'open-add']);
 </script>
 
 <template>
   <div class="actions-container">
     <h3 class="section-title">Быстрые действия</h3>
-    <button class="action-btn primary-action" @click="emit('navigate', 'expenses')">
+    <button class="action-btn primary-action" @click="emit('open-add')">
       <Plus :size="20" />
       <span>Добавить трату</span>
     </button>

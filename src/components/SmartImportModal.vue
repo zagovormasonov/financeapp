@@ -4,9 +4,10 @@ import { parseTransactions } from '../services/aiService';
 import { addTransaction } from '../data/mockData';
 import { X, Upload, Check, FileText } from 'lucide-vue-next';
 import * as pdfjsLib from 'pdfjs-dist';
+// Используем Vite-способ импорта воркера
+import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.mjs?url';
 
-// Устанавливаем воркер через CDN для простоты, так как pdfjs-dist требует воркера
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 const props = defineProps(['isOpen']);
 const emit = defineEmits(['close']);

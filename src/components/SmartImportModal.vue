@@ -2,7 +2,11 @@
 import { ref } from 'vue';
 import { parseTransactions } from '../services/aiService';
 import { addTransaction } from '../data/mockData';
-import { X, Upload, Check } from 'lucide-vue-next';
+import { X, Upload, Check, FileText } from 'lucide-vue-next';
+import * as pdfjsLib from 'pdfjs-dist';
+
+// Устанавливаем воркер через CDN для простоты, так как pdfjs-dist требует воркера
+pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 const props = defineProps(['isOpen']);
 const emit = defineEmits(['close']);
@@ -10,6 +14,7 @@ const emit = defineEmits(['close']);
 const inputText = ref('');
 const parsedItems = ref([]);
 const isLoading = ref(false);
+const fileInput = ref(null);
 
 const handleParse = async () => {
   if (!inputText.value.trim()) return;
@@ -22,6 +27,39 @@ const handleParse = async () => {
     alert('Не удалось распознать текст');
   } finally {
     isLoading.value = false;
+  }
+};
+
+const handleFileUpload = async (event) => {
+  const file = event.target.files[0];
+  if (!file || file.type !== 'application/pdf') return;
+
+  isLoading.value = true;
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+    const pdf = await loadingTask.promise;
+    
+    let fullText = '';
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const textContent = await page.getTextContent();
+      const pageText = textContent.items.map(item => item.str).join(' ');
+      fullText += pageText + '\n';
+    }
+
+    if (fullText.trim()) {
+      const result = await parseTransactions(fullText);
+      parsedItems.value = result;
+    } else {
+      alert('Не удалось извлечь текст из PDF. Попробуйте скопировать текст вручную.');
+    }
+  } catch (error) {
+    console.error('PDF processing error:', error);
+    alert('Ошибка при обработке PDF: ' + error.message);
+  } finally {
+    isLoading.value = false;
+    if (event.target) event.target.value = ''; // Сброс инпута
   }
 };
 
@@ -48,19 +86,47 @@ const handleClose = () => {
       </div>
 
       <div v-if="parsedItems.length === 0" class="import-step">
-        <p class="instruction">Вставьте текст из СМС, выписки или истории операций банка:</p>
+        <p class="instruction">Загрузите PDF выписку или вставьте текст из СМС/истории операций:</p>
+        
+        <div class="upload-container">
+          <button 
+            class="upload-btn" 
+            @click="fileInput.click()"
+            :disabled="isLoading"
+          >
+            <div class="upload-icon-wrapper">
+              <FileText v-if="!isLoading" :size="24" />
+              <span v-else class="mini-spinner dark"></span>
+            </div>
+            <span>{{ isLoading ? 'Обработка...' : 'Загрузить PDF выписку' }}</span>
+          </button>
+          <input 
+            type="file" 
+            ref="fileInput" 
+            style="display: none" 
+            accept="application/pdf"
+            @change="handleFileUpload"
+          >
+        </div>
+
+        <div class="divider">
+          <span>или</span>
+        </div>
+
         <textarea 
           v-model="inputText" 
-          placeholder="Например: Покупка 450р Пятерочка..." 
+          placeholder="Вставьте текст операции, например: Покупка 450р Пятерочка..." 
           class="import-area"
+          :disabled="isLoading"
         ></textarea>
+        
         <button 
           class="submit-btn" 
           :disabled="isLoading || !inputText" 
           @click="handleParse"
         >
           <span v-if="isLoading" class="mini-spinner"></span>
-          {{ isLoading ? 'Распознаю...' : 'Проанализировать ИИ' }}
+          {{ isLoading ? 'Распознаю...' : 'Проанализировать текст' }}
         </button>
       </div>
 
@@ -78,9 +144,9 @@ const handleClose = () => {
           </div>
         </div>
         <button class="submit-btn success-btn" @click="confirmImport">
-          <Check :size="20" /> Добавить все
+          <Check :size="20" /> Добавить в бюджет
         </button>
-        <button class="back-link" @click="parsedItems = []">Попробовать другой текст</button>
+        <button class="back-link" @click="parsedItems = []">Попробовать другой файл/текст</button>
       </div>
     </div>
   </div>
@@ -104,6 +170,8 @@ const handleClose = () => {
   padding: 24px;
   animation: slideUp 0.3s ease-out;
   color: var(--text-main);
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 @keyframes slideUp {
@@ -123,11 +191,71 @@ const handleClose = () => {
   color: var(--text-secondary);
   margin-bottom: 16px;
   line-height: 1.4;
+  text-align: center;
+}
+
+.upload-container {
+  margin-bottom: 24px;
+}
+
+.upload-btn {
+  width: 100%;
+  background: var(--bg-color);
+  border: 2px dashed var(--primary-light);
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--text-main);
+}
+
+.upload-btn:hover {
+  background: var(--primary-light);
+  border-color: var(--primary);
+}
+
+.upload-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  background: var(--primary);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 16px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--primary-light);
+}
+
+.divider:not(:empty)::before {
+  margin-right: .5em;
+}
+
+.divider:not(:empty)::after {
+  margin-left: .5em;
 }
 
 .import-area {
   width: 100%;
-  min-height: 120px;
+  min-height: 100px;
   background: var(--bg-color);
   border: 1px solid var(--primary-light);
   border-radius: 16px;
@@ -137,6 +265,7 @@ const handleClose = () => {
   font-size: 15px;
   margin-bottom: 20px;
   outline: none;
+  resize: none;
 }
 
 .parsed-list {
@@ -144,7 +273,7 @@ const handleClose = () => {
   flex-direction: column;
   gap: 12px;
   margin-bottom: 24px;
-  max-height: 300px;
+  max-height: 400px;
   overflow-y: auto;
 }
 
@@ -192,6 +321,7 @@ const handleClose = () => {
   align-items: center;
   justify-content: center;
   gap: 8px;
+  cursor: pointer;
 }
 
 .success-btn {
@@ -207,6 +337,7 @@ const handleClose = () => {
   margin-top: 16px;
   font-size: 14px;
   font-weight: 500;
+  cursor: pointer;
 }
 
 .close-btn {
@@ -219,6 +350,7 @@ const handleClose = () => {
   align-items: center;
   justify-content: center;
   color: var(--text-main);
+  cursor: pointer;
 }
 
 .mini-spinner {
@@ -230,8 +362,14 @@ const handleClose = () => {
   animation: spin 1s linear infinite;
 }
 
+.mini-spinner.dark {
+  border: 2px solid rgba(0,0,0,0.1);
+  border-top: 2px solid var(--primary);
+}
+
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
 </style>
+

@@ -11,26 +11,35 @@ export const aiInsights = ref(JSON.parse(localStorage.getItem('aiInsights')) || 
 export const isAiLoading = ref(false);
 
 // Function to add a transaction
-export function addTransaction(name, amount, type = 'expense', category = 'Other') {
-  const today = new Date();
+export function addTransaction(name, amount, type = 'expense', category = 'Other', customDate = null) {
+  const dateObj = customDate ? new Date(customDate) : new Date();
+  
+  // Если передана некорректная дата, используем текущую
+  const finalDate = isNaN(dateObj.getTime()) ? new Date() : dateObj;
+  
   const options = { day: 'numeric', month: 'long' };
-  const dateStr = today.toLocaleDateString('ru-RU', options);
+  const dateStr = finalDate.toLocaleDateString('ru-RU', options);
 
   let dateGroup = transactions.value.find(g => g.date === dateStr);
   
   if (!dateGroup) {
     dateGroup = { date: dateStr, items: [] };
-    transactions.value.unshift(dateGroup);
+    // Добавляем группу и сортируем группы по дате (в реальности лучше хранить timestamp для сортировки)
+    transactions.value.push(dateGroup);
+    // Простая сортировка групп (сегодня - сверху) - для демо
+    // В полноценном приложении стоит хранить ISO даты
   }
 
-  const newId = Math.max(0, ...transactions.value.flatMap(g => g.items.map(i => i.id))) + 1;
+  const allItems = transactions.value.flatMap(g => g.items);
+  const newId = allItems.length > 0 ? Math.max(...allItems.map(i => i.id)) + 1 : 1;
   
   dateGroup.items.unshift({
     id: newId,
     name,
     amount: type === 'expense' ? -Math.abs(amount) : Math.abs(amount),
     type,
-    category
+    category,
+    date: finalDate.toISOString() // Сохраняем полную дату для истории
   });
 
   // Clear insights when data changes to trigger re-generation

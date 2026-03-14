@@ -66,7 +66,7 @@ const handleFileUpload = async (event) => {
 
 const confirmImport = () => {
   parsedItems.value.forEach(item => {
-    addTransaction(item.name, Math.abs(item.amount), item.type, item.category);
+    addTransaction(item.name, Math.abs(item.amount), item.type, item.category, item.date);
   });
   handleClose();
 };
@@ -137,7 +137,10 @@ const handleClose = () => {
           <div v-for="(item, idx) in parsedItems" :key="idx" class="parsed-item">
             <div class="item-info">
               <span class="item-name">{{ item.name }}</span>
-              <span class="item-cat">{{ item.category }}</span>
+              <div class="item-meta">
+                <span class="item-cat">{{ item.category }}</span>
+                <span v-if="item.date" class="item-date">• {{ new Date(item.date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }) }}</span>
+              </div>
             </div>
             <span class="item-amount" :class="item.type">
               {{ item.type === 'income' ? '+' : '-' }}{{ Math.abs(item.amount) }} ₽
@@ -297,7 +300,13 @@ const handleClose = () => {
   font-size: 15px;
 }
 
-.item-cat {
+.item-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.item-cat, .item-date {
   font-size: 12px;
   color: var(--text-secondary);
 }

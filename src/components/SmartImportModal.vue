@@ -42,25 +42,35 @@ const handleFileUpload = async (event) => {
     const pdf = await loadingTask.promise;
     
     let fullText = '';
-    for (let i = 1; i <= pdf.numPages; i++) {
+    // Ограничиваемся первыми 5 страницами для стабильности и лимитов ИИ
+    const maxPages = Math.min(pdf.numPages, 5);
+    
+    for (let i = 1; i <= maxPages; i++) {
       const page = await pdf.getPage(i);
       const textContent = await page.getTextContent();
       const pageText = textContent.items.map(item => item.str).join(' ');
       fullText += pageText + '\n';
     }
 
-    if (fullText.trim()) {
-      const result = await parseTransactions(fullText);
-      parsedItems.value = result;
+    // Обрезаем текст, если он слишком длинный для GPT (оставляем примерно 10к символов)
+    const sanitizedText = fullText.slice(0, 10000);
+
+    if (sanitizedText.trim()) {
+      const result = await parseTransactions(sanitizedText);
+      if (result && result.length > 0) {
+        parsedItems.value = result;
+      } else {
+        alert('ИИ не нашел транзакций в этом файле. Убедитесь, что это банковская выписка.');
+      }
     } else {
-      alert('Не удалось извлечь текст из PDF. Попробуйте скопировать текст вручную.');
+      alert('Не удалось извлечь текст из PDF (файл может быть отсканированным изображением).');
     }
   } catch (error) {
     console.error('PDF processing error:', error);
     alert('Ошибка при обработке PDF: ' + error.message);
   } finally {
     isLoading.value = false;
-    if (event.target) event.target.value = ''; // Сброс инпута
+    if (event.target) event.target.value = '';
   }
 };
 
